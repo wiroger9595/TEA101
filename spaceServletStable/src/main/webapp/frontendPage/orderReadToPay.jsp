@@ -3,7 +3,94 @@
 
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
     
-<%@include file="/frontendPage/template/header.jsp"%>      
+<%@include file="/frontendPage/template/header.jsp"%> 
+<%@ page import="java.util.*"%>
+     
+<%@ page import="com.spaceDetail.model.*"%>
+<%@ page import="com.spaceComment.model.*"%>
+<%@ page import="com.space.model.*"%>
+
+<%@ page import="com.spacePhoto.model.*"%>
+<%@ page import="com.orderDetail.model.*"%>
+<%@ page import="com.orderMaster.model.*"%>
+
+
+
+<%
+	String spaceId = request.getParameter("spaceId");
+	String spaceDetailId = request.getParameter("spaceDetailId");
+	
+	SpaceDetailService spaceDetailSvc = new SpaceDetailService();
+	SpaceDetailVO listOneSpaceDetail = spaceDetailSvc.selectOneSpaceDetail(spaceId);
+	pageContext.setAttribute("listOneSpaceDetail",listOneSpaceDetail);
+	//String spaceCommentId = request.getParameter("spaceCommentId");
+	
+	System.out.print(spaceId + "asasaasaasa");
+	System.out.print(spaceDetailId + "m,,m,.,.,.,.");
+	
+/* 	SpacePhotoService sps = new SpacePhotoService();
+	SpaceDetailService spaceDetailSvc = new SpaceDetailService();
+    MemberService memberService = new MemberService();
+	SpaceService spaceSvc = new SpaceService();
+	
+	List<SpaceVO> listSpace = spaceSvc.selectAllSpace();
+	pageContext.setAttribute("listSpace",listSpace);  
+	
+	 */
+
+    
+        
+	
+	
+	
+	OrderDetailService orderDetailService = new OrderDetailService();
+	List<OrderDetailVO> listAllOrderDetail = orderDetailService.selectAllOrderDetail();
+	
+	SpaceDetailService spaceDetailService = new SpaceDetailService();
+	
+	//String oneSpaceDetail = spaceDetailService.
+	
+	
+	pageContext.setAttribute("listAllSpaceComment",listAllOrderDetail); 
+
+	
+    OrderDetailVO orderDetailId = listAllOrderDetail.get(0);
+
+	
+	
+	//OrderDetailVO orderDetailVO = new OrderDetailVO();
+	
+	
+/* 	OrderDetailVO insertOrderDetailVO = orderDetailService.addOrderDetail(orderDetailId);
+	pageContext.setAttribute("insertOrderDetailVO", insertOrderDetailVO);
+	
+	System.out.print(insertOrderDetailVO + " 1248y1249812 ");
+	
+	
+	
+	
+	
+	
+	
+ 	OrderMasterVO orderMasterVO = new OrderMasterVO();
+	
+	OrderMasterService orderMasterService = new OrderMasterService();
+	OrderMasterVO insertOrderMasterVO = orderMasterService.addOrderMaster(orderMasterVO);
+	pageContext.setAttribute("insertOrderMasterVO", insertOrderMasterVO);
+	
+	
+	System.out.print(insertOrderMasterVO + " 8787623r09 "); 
+ */
+	
+	
+ 	OrderMasterVO orderMasterVO = (OrderMasterVO) request.getAttribute("OrderMasterVO");
+	
+ 	OrderDetailVO orderDetailVO = (OrderDetailVO) request.getAttribute("OrderDetailVO");
+ 	
+ 	
+ 	
+ 	
+%>
     
 
 	<!-- /header -->
@@ -42,10 +129,17 @@
 			</div>
 		</div>
 		<!--/hero_in-->
+		
+		
+		<!-- ============================================================= -->
+		
+		
+		
 
 		<div class="bg_color_1">
 			<div class="container margin_60_35">
 				<div class="row">
+				
 					<div class="col-lg-8">
 						<div class="box_cart">
 						<div class="message">
@@ -57,28 +151,31 @@
 								Mussum ipsum cacilds, vidis litro abertis.
 							</p>
 						</div>
+						
+						
+					
+
 						<div class="step">
+						
+						
 							<div class="row">
-							<div class="col-sm-6">
+							<div class="col-sm-12">
 								<div class="form-group">
-									<label>First name</label>
-									<input type="text" class="form-control" id="firstname_booking" name="firstname_booking">
+									<label>Full name</label>
+									<input type="text" name="fullNameId" id="memberId" class="form-control" value="MEM00001">
 								</div>
 							</div>
-							<div class="col-sm-6">
-								<div class="form-group">
-									<label>Last name</label>
-									<input type="text" class="form-control" id="lastname_booking" name="lastname_booking">
-								</div>
+							
 							</div>
-						</div>
 						<div class="row">
 							<div class="col-sm-6">
 								<div class="form-group">
 									<label>Email</label>
-									<input type="email" id="email_booking" name="email_booking" class="form-control">
+									<input type="email" id="email_booking" name="memberEmail" class="form-control">
 								</div>
 							</div>
+						</div>
+						<div class="row">
 							<div class="col-sm-6">
 								<div class="form-group">
 									<label>Confirm email</label>
@@ -90,11 +187,14 @@
 							<div class="col-sm-6">
 								<div class="form-group">
 									<label>Telephone</label>
-									<input type="text" id="telephone_booking" name="telephone_booking" class="form-control">
+									<input type="text" id="telephone_booking" name="memberPhone" class="form-control">
 								</div>
 							</div>
 						</div>
 						</div>
+						
+						
+						
 						<hr>
 						<!--End step -->
 
@@ -104,6 +204,8 @@
 								Mussum ipsum cacilds, vidis litro abertis.
 							</p>
 						</div>
+						
+						
 						<div class="step">
 							<div class="form-group">
 							<label>Name on card</label>
@@ -180,7 +282,7 @@
 										<label>Country</label>
 										<div class="custom-select-form">
 										<select class="wide add_bottom_15" name="country" id="country">
-											<option value="" selected>Select your country</option>
+											<option value="" selected>Select your Area</option>
 											<option value="Europe">Europe</option>
 											<option value="United states">United states</option>
 											<option value="South America">South America</option>
@@ -192,39 +294,19 @@
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-sm-6">
+								<div class="col-sm-12">
 									<div class="form-group">
 										<label>Street line 1</label>
 										<input type="text" id="street_1" name="street_1" class="form-control">
 									</div>
 								</div>
-								<div class="col-sm-6">
-									<div class="form-group">
-										<label>Street line 2</label>
-										<input type="text" id="street_2" name="street_2" class="form-control">
-									</div>
-								</div>
+								
 							</div>
-							<div class="row">
-								<div class="col-md-6 col-sm-12">
-									<div class="form-group">
-										<label>City</label>
-										<input type="text" id="city_booking" name="city_booking" class="form-control">
-									</div>
-								</div>
-								<div class="col-md-3 col-sm-6">
-									<div class="form-group">
-										<label>State</label>
-										<input type="text" id="state_booking" name="state_booking" class="form-control">
-									</div>
-								</div>
-								<div class="col-md-3 col-sm-6">
-									<div class="form-group">
-										<label>Postal code</label>
-										<input type="text" id="postal_code" name="postal_code" class="form-control">
-									</div>
-								</div>
-							</div>
+							
+							
+							
+							
+							
 							<!--End row -->
 						</div>
 						<hr>
@@ -248,15 +330,27 @@
 								<li>Adults <span>2</span></li>
 								<li>Childs <span>1</span></li>
 							</ul>
-							<a href="cart-3.html" class="btn_1 full-width purchase">Purchase</a>
+							
+								
+								
+									<a href="cart-3.html" class="btn_1 full-width purchase">Purchase</a>
+									<input type="hidden" name="action"	value="frontend_getOne_For_Display">
+							     	<input type="hidden" name="spaceId"  value="${spaceVO.spaceId}">
+							   	 	<input type="submit" value="前往場地介紹">
+					
+							
 							<div class="text-center"><small>No money charged in this step</small></div>
 						</div>
 					</aside>
+			
 				</div>
+				
 				<!-- /row -->
 			</div>
+			
 			<!-- /container -->
 		</div>
+		
 		<!-- /bg_color_1 -->
 	</main>
 	<!--/main-->

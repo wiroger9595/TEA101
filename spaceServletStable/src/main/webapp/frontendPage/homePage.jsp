@@ -1,21 +1,91 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     
-    
- <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-    
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <%@include file="/frontendPage/template/header.jsp"%>    
+<%@ page import="java.util.*"%>
+
+<%@ page import="com.space.model.*"%>
+<%@ page import="com.spaceDetail.model.*"%>
+<%@ page import="com.spaceComment.model.*"%>
+<%@ page import="com.spacePhoto.model.*"%>
+  
+<%
+    
+ /*  ====================================================================  */ 
+ 
+ 	SpacePhotoService sps = new SpacePhotoService();
+ 
+    SpaceService spaceSvc = new SpaceService();
+    List<SpaceVO> listSpace = spaceSvc.selectAllSpace();
+    pageContext.setAttribute("listSpace",listSpace);  
+    
+    
+    SpaceVO spaceVO = listSpace.get(0);
+    
+    
+   	System.out.print(spaceVO + " ijijijij ");
+    /*  ====================================================================  */ 
+    SpaceDetailService spaceDetailSvc = new SpaceDetailService();
+    List<SpaceDetailVO> listSpaceDetail = spaceDetailSvc.selectAllSpaceDetail();
+    pageContext.setAttribute("listSpaceDetail",listSpaceDetail);  
     
     
     
-			<main>
+    
+    String spaceDetailId = listSpaceDetail.get(0).getSpaceDetailId(); 
+   	System.out.print(spaceDetailId + " jkjkjkj ");
+   	System.out.print(SpaceDetailVO.class + " jkjkjkj ");
+
+    /*  ====================================================================  */ 
+    		
+    
+    SpaceCommentService spaceCommentSvc = new SpaceCommentService();
+    List<SpaceCommentVO> listSpaceComment = spaceCommentSvc.getAll();
+    pageContext.setAttribute("listSpaceComment",listSpaceComment);
+    
+    /*  ====================================================================  */ 
+    
+    		
+    SpacePhotoService spacePhotoSvc = new SpacePhotoService();
+    List<SpacePhotoVO> listSpacePhoto = spacePhotoSvc.getAll();
+	
+    //SpacePhotoVO oneSpacePhotoVO = (SpacePhotoVO)session.getAttribute("SpacePhotoVO");
+    
+    
+    //byte[] spacePhoto = spacePhotoSvc.selectOnePhotoMember(spaceId).getSpacePhoto();
+    byte[] oneSpacePhotoVO = listSpacePhoto.get(0).getSpacePhoto();
+    
+    System.out.print(oneSpacePhotoVO + "uuuuuuu");
+    //System.out.print(spacePhoto + "jkqwqqwqwqq");
+    
+    
+    
+    
+   // String listOneSpacePhoto = spacePhotoSvc.selectOnePhotoMember(spaceId);
+    pageContext.setAttribute("oneSpacePhotoVO",oneSpacePhotoVO);
+    
+    	Base64.Encoder encoder = Base64.getEncoder();
+/*  ====================================================================  */  
+
+ %> 
+
+	
+
+
+<%-- <jsp:useBean id="avgSvc" scope="page" class="com.spaceComment.Service.SpaceCommentServiceService" />
+ --%>
+    
+	<main>
 		<section class="header-video">
 			<div id="hero_video">
 				<div class="wrapper">
 				<div class="container">
 					<h3>Book unique experiences</h3>
 					<p>Expolore top rated tours, hotels and restaurants around the world</p>
-					<form>
+					<FORM METHOD="post" ACTION="<%=request.getContextPath()%>/frontendPage/searchMap.jsp" enctype="multipart/form-data">
+					
 						<div class="row no-gutters custom-search-input-2">
 							<div class="col-lg-4">
 								<div class="form-group">
@@ -38,15 +108,20 @@
 								</select>
 							</div>
 							<div class="col-lg-2">
-								<input type="submit" class="btn_search" value="Search"><a href="/frontendPage/searchMap.jsp"></a>
+			
+									<input type="submit" class="btn_search">
+								
 							</div>
 						</div>
 						<!-- /row -->
 					</form>
+						
+						
+						
+					
+					</div>
+				
 				</div>
-			</div>
-			</div>
-			<img src="img/video_fix.png" alt="" class="header-video--media" data-video-src="video/intro" data-teaser-source="video/intro" data-provider="" data-video-width="1920" data-video-height="960">
 		</section>
 		<!-- /header-video -->
 
@@ -58,49 +133,68 @@
 				<p>Cum doctus civibus efficiantur in imperdiet deterruisset.</p>
 			</div>
 			<div id="reccomended" class="owl-carousel owl-theme">
-				<div class="item">
-					<div class="box_grid">
-						<figure>
-							<a href="#0" class="wish_bt"></a>
-							<a href="tour-detail.html"><img src="img/tour_1.jpg" class="img-fluid" alt="" width="800" height="533"><div class="read_more"><span>Read more</span></div></a>
-							<small>Historic</small>
-						</figure>
-						<div class="wrapper">
-							<h3><a href="tour-detail.html">Arc Triomphe</a></h3>
-							<p>Id placerat tacimates definitionem sea, prima quidam vim no. Duo nobis persecuti cu.</p>
-							<span class="price">From <strong>$54</strong> /per person</span>
+			
+			
+				
+					
+						<c:forEach var="spaceVO" items="${listSpace}" varStatus="status">
+							
+						 <form method="post" action="/space/space.do"  enctype="multipart/form-data" name="spaceForm">
+			     
+							<div class="item">
+								<div class="box_grid" name="clickSpaceDetail" onclick="clickSpaceDetail">
+									<figure>
+										<a href="#0" class="wish_bt"></a>
+										<a href="<%=request.getContextPath()%>/space/space.do?action=frontend_getOne_For_Display&spaceId=${spaceVO.spaceId}"><img src="<%=request.getContextPath()%>/space/showonepicture?spaceId=${spaceVO.spaceId}""><img src="<%=request.getContextPath()%>/space/showonepicture?spaceId=${spaceVO.spaceId}" class="img-fluid" alt="" width="800" height="533"><div class="read_more"><span>Read more</span></div></a>
+<%-- 										<!-- data:image/png;base64,<%=encode.encodeToString(((SpacePhotoVO)pageContext.getAttribute("oneSpacePhotoVO")).getSpacePhoto())%>" -->
+ --%>										
+										<small>Historic</small>
+									</figure>
+									<div class="wrapper">
+										<h3><a href="">${spaceVO.spaceName}</a></h3>
+										<p>Id placerat tacimates definitionem sea, prima quidam vim no. Duo nobis persecuti cu.</p>
+										<span class="price">From <strong>$54</strong> /per person</span>
+									</div>
+									<ul>
+										<li><i class="icon_clock_alt"></i> 1h 30min</li>
+										<li><div class="score">
+										
+											<span>Superb<em>350 Reviews</em></span>
+											
+												<c:forEach var="spaceCommentVO" items="">
+													<c:if test="${spaceCommentVO.spaceId == spaceVO.spaceId}" >
+														<strong>${avgSvc.avgReview}</strong>
+													</c:if>
+												</c:forEach>
+											
+											</div></li>
+										</ul>
+									</div>
+								</div>
+								 <input type="hidden" name="action"	value="frontend_getOne_For_Display">
+							     <input type="hidden" name="spaceId"  value="${spaceVO.spaceId}">
+							   	 <input type="submit" value="前往場地介紹">
+								</form>
+								
+							</c:forEach>	
 						</div>
-						<ul>
-							<li><i class="icon_clock_alt"></i> 1h 30min</li>
-							<li><div class="score"><span>Superb<em>350 Reviews</em></span><strong>8.9</strong></div></li>
-						</ul>
 					</div>
-				</div>
+					<!-- /item -->
+				
+				
+				
+				
+				
+				
+				
+				
+				
 				<!-- /item -->
 				<div class="item">
 					<div class="box_grid">
 						<figure>
 							<a href="#0" class="wish_bt"></a>
-							<a href="tour-detail.html"><img src="img/tour_2.jpg" class="img-fluid" alt="" width="800" height="533"><div class="read_more"><span>Read more</span></div></a>
-							<small>Churches</small>
-						</figure>
-						<div class="wrapper">
-							<h3><a href="tour-detail.html">Notredam</a></h3>
-							<p>Id placerat tacimates definitionem sea, prima quidam vim no. Duo nobis persecuti cu.</p>
-							<span class="price">From <strong>$124</strong> /per person</span>
-						</div>
-						<ul>
-							<li><i class="icon_clock_alt"></i> 1h 30min</li>
-							<li><div class="score"><span>Good<em>350 Reviews</em></span><strong>7.0</strong></div></li>
-						</ul>
-					</div>
-				</div>
-				<!-- /item -->
-				<div class="item">
-					<div class="box_grid">
-						<figure>
-							<a href="#0" class="wish_bt"></a>
-							<a href="tour-detail.html"><img src="img/tour_3.jpg" class="img-fluid" alt="" width="800" height="533"><div class="read_more"><span>Read more</span></div></a>
+							<a href="<%=request.getContextPath()%>/space/space.do?action=frontend_getOne_For_Display&spaceId=${spaceVO.spaceId}"><img src="<%=request.getContextPath()%>/space/showonepicture?spaceId=${spaceVO.spaceId}""><img src="img/tour_3.jpg" class="img-fluid" alt="" width="800" height="533"><div class="read_more"><span>Read more</span></div></a>
 							<small>Historic</small>
 						</figure>
 						<div class="wrapper">
@@ -187,6 +281,8 @@
 					<p>Cum doctus civibus efficiantur in imperdiet deterruisset.</p>
 				</div>
 				<div class="row">
+				
+				
 					<div class="col-xl-3 col-lg-6 col-md-6">
 						<a href="hotel-detail.html" class="grid_item">
 							<figure>
@@ -199,6 +295,8 @@
 							</figure>
 						</a>
 					</div>
+					
+					
 					<!-- /grid_item -->
 					<div class="col-xl-3 col-lg-6 col-md-6">
 						<a href="hotel-detail.html" class="grid_item">
@@ -306,7 +404,18 @@
 			</section>
 			<!-- /section -->
 
-			
+			<div class="banner mb-0">
+				<div class="wrapper d-flex align-items-center opacity-mask" data-opacity-mask="rgba(0, 0, 0, 0.3)">
+					<div>
+						<small>Adventure</small>
+						<h3>Your Perfect<br>Advenure Experience</h3>
+						<p>Activities and accommodations</p>
+						<a href="adventure.html" class="btn_1">Read more</a>
+					</div>
+				</div>
+				<!-- /wrapper -->
+			</div>
+			<!-- /banner -->
 
 		</div>
 		<!-- /container -->
@@ -383,6 +492,20 @@
 		</div>
 		<!-- /bg_color_1 -->
 
+		<div class="call_section">
+			<div class="container clearfix">
+				<div class="col-lg-5 col-md-6 float-right wow" data-wow-offset="250">
+					<div class="block-reveal">
+						<div class="block-vertical"></div>
+						<div class="box_1">
+							<h3>Enjoy a GREAT travel with us</h3>
+							<p>Ius cu tamquam persequeris, eu veniam apeirian platonem qui, id aliquip voluptatibus pri. Ei mea primis ornatus disputationi. Menandri erroribus cu per, duo solet congue ut. </p>
+							<a href="#0" class="btn_1 rounded">Read more</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 		
 	</main>
 	<!-- /main -->

@@ -11,6 +11,7 @@
 <%@ page import="com.spaceDetail.model.*"%>
 <%@ page import="com.spaceComment.model.*"%>
 <%@ page import="com.spacePhoto.model.*"%>
+<%@ page import="com.spacePhoto.service.controller.*"%>
 
 
 
@@ -35,19 +36,24 @@
     
     
 /*  ====================================================================  */   	
-	String spacePhotoId = request.getParameter("spacePhotoId");
+	//String spacePhotoId = request.getParameter("spacePhotoId");
 	
 	SpacePhotoService spacePhotoSvc = new SpacePhotoService();
-	SpacePhotoVO listOneSpacePhoto = spacePhotoSvc.selectOneSpacePhoto(spacePhotoId);
-	pageContext.setAttribute("listOneSpacePhoto",listOneSpacePhoto);
+    List<SpacePhotoVO> listSpacePhoto = spacePhotoSvc.getAll();
+
     
-    Map<String, Object> combineSpaceId = new HashMap<String, Object>();
+
+    
+	//SpacePhotoVO listOneSpacePhoto = spacePhotoSvc.selectOneSpacePhoto(spacePhotoId);
+	//pageContext.setAttribute("listOneSpacePhoto",listOneSpacePhoto);
+    
+    //Map<String, Object> combineSpaceId = new HashMap<String, Object>();
     
     
 %>
 
 	
-
+	<form method="post" enctype="multipart/form-data">
 
 	<main>
 	<div class="container-fluid full-height">
@@ -71,7 +77,7 @@
 							<i class="icon_search"></i>
 						</div>
 						<div class="form-group">
-							<input class="form-control" type="text" placeholder="Where">
+							<input class="form-control" type="text" placeholder="Where" >
 							<i class="icon_pin_alt"></i>
 						</div>
 						<select class="wide">
@@ -194,19 +200,18 @@
 		</c:if> --%>
 		
 		
-		
-		<c:forEach var="spaceVO" items="${listSpace}" varStatus="status">
+		<%@ include file="/frontendPage/template/page1.file" %>
+		<c:forEach var="spaceVO" items="${listSpace}" begin="<%=pageIndex%>" end="<%=pageIndex+rowsPerPage-1%>" varStatus="status">
 			
 		
 				
 					<div class="box_list map_view">
 					    <div class="row no-gutters add_top_20">
 					        <div class="col-4">
-
 						            <figure>
 						            	
 						                <small>Museum</small>
-						                <a href="<%=request.getContextPath()%>/space/space.do?action=frontend_getOne_For_Display&spaceId=${spaceVO.spaceId}"><img src="${spacePhotoVO.spacePhoto}" class="img-fluid" alt="" width="800" height="533"></a>
+						                <a href="<%=request.getContextPath()%>/space/space.do?action=frontend_getOne_For_Display&spaceId=${spaceVO.spaceId}"><img src="<%=request.getContextPath()%>/space/showonepicture?spaceId=${spaceVO.spaceId}" class="img-fluid" alt="" width="800" height="533"></a>
 						            </figure>
 						            
 						         
@@ -245,12 +250,12 @@
 					<!-- /box_list -->
 		
 	</c:forEach>
+	<%@ include file="/frontendPage/template/page2.file" %>	
 			
 			
 			
 			
-			
-						<ul class="pagination pagination-sm add_bottom_30">
+					<!-- 	<ul class="pagination pagination-sm add_bottom_30">
 							<li class="page-item disabled">
 														<a class="page-link" href="#" tabindex="-1">Previous</a>
 													</li>
@@ -260,7 +265,7 @@
 													<li class="page-item">
 														<a class="page-link" href="#">Next</a>
 													</li>
-												</ul>
+												</ul> -->
 	
 	
 	
@@ -290,10 +295,11 @@
 	<!-- /container-fluid -->	
 		
 	</main>
+		<input type="hidden" name="spaceId"  value="${spaceVO.spaceId}">
+		<input type="hidden" name="action"	value="frontend_getOne_For_Display"></FORM>
 
 
-
-
+	</form>
 
 
 
@@ -353,6 +359,9 @@
 		</form>
 		<!--form -->
 	</div>
+	
+	
+
 	<!-- /Sign In Popup -->
 		
 	<!-- COMMON SCRIPTS -->
@@ -376,7 +385,6 @@
 
 
 <script>
-
 	$(function(){
 		var url="${pageContext.request.contextPath}/frontendPage/searchMap.jsp";
 		var obj = {"method":"selectAllSpace"};
@@ -394,9 +402,43 @@
 		
 		
 	});
-
-
 </script>
+
+
+
+<!--   ================================  get geo location =======================================================-->
+
+
+<script>
+    var searchInput = 'search_input';
+
+$(document).ready(function () {
+    var autocomplete;
+        autocomplete = new google.maps.places.Autocomplete((document.getElementById(searchInput)), {
+            types: ['geocode'],
+        });
+        
+        google.maps.event.addListener(autocomplete, 'place_changed', function () {
+            var near_place = autocomplete.getPlace();
+            document.getElementById('loc_lat').value = near_place.geometry.location.lat();
+            document.getElementById('loc_long').value = near_place.geometry.location.lng();
+            
+            document.getElementById('latitude_view').innerHTML = near_place.geometry.location.lat();
+            document.getElementById('longitude_view').innerHTML = near_place.geometry.location.lng();
+        });
+    });
+
+
+    $(document).on('change', '#'+searchInput, function () {
+    document.getElementById('latitude_input').value = '';
+    document.getElementById('longitude_input').value = '';
+	
+    document.getElementById('latitude_view').innerHTML = '';
+    document.getElementById('longitude_view').innerHTML = '';
+});
+</script>
+
+
 
 
 </html>

@@ -11,8 +11,10 @@
 <%@ page import="com.spaceComment.model.*"%>
 <%@ page import="com.spacePhoto.model.*"%>
 
+
+	<% 	Base64.Encoder encoder = Base64.getEncoder(); %>
+
 <%
-	String splitEquiment = "SELECT SPACE_EQUMENT LIKE '%,%' THEN LEFT(SPACE_COMMENT, Charindex(',' , SPACE_COMMENT)-1) ELSE SPACE_EQUMENT END, CASE WHEN name LIKE '% %' THEN RIGHT(name, Charindex(' ', Reverse(name)) - 1) END FROM SPACE_COMMENT ";
 	
 /* ===================== space id =============================================== */
 	
@@ -24,6 +26,7 @@
 	SpaceService spaceSvc = new SpaceService();
 	SpaceVO listOneSpace = spaceSvc.selectOneSpace(spaceId);
 	pageContext.setAttribute("listOneSpace",listOneSpace);
+	System.out.println(spaceId);
 
 	/* ===================== space detail =============================================== */
 
@@ -50,14 +53,25 @@
 	/* ===================== space photo =============================================== */
 	
 	
-	String spacePhotoId = request.getParameter("spacePhotoId");
+	SpacePhotoVO spacePhotoVO = (SpacePhotoVO) request.getAttribute("sPhotoVO");
+	//SpaceDetailService spaceDetailSvc = new SpaceDetailService();
+	pageContext.setAttribute("spacePhotoVO",spacePhotoVO);
+	
+	//System.out.print(spacePhotoVO + " ooooooo  ");
+	
+	/* String spacePhotoId = request.getParameter("spacePhotoId");
 	
 	SpacePhotoService spacePhotoSvc = new SpacePhotoService();
 	SpacePhotoVO listOneSpacePhoto = spacePhotoSvc.selectOneSpacePhoto(spacePhotoId);
 	pageContext.setAttribute("listOneSpacePhoto",listOneSpacePhoto);
 	
 	List<SpacePhotoVO> listAllSpacePhoto = spacePhotoSvc.getAll();
-	pageContext.setAttribute("listAllSpacePhoto",listAllSpacePhoto);
+	pageContext.setAttribute("listAllSpacePhoto",listAllSpacePhoto); */
+	
+	
+	
+	/* ===================== select all comment from all one spaceId =============================================== */
+	
 	
 %>
 
@@ -70,9 +84,9 @@
 				</div>
 				
 					<span class="magnific-gallery">
-						<a href="${spacePhotoVO.spacePhoto}" class="btn_photos" title="Photo title" data-effect="mfp-zoom-in">View photos</a>
+						<a href="<%=request.getContextPath()%>/space/showonepicture?spaceId=${spaceVO.spaceId}" class="btn_photos" title="Photo title" data-effect="mfp-zoom-in">View photos</a>
 	
-								<a href="${spacePhotoVO.spacePhoto}" title="Photo title" data-effect="mfp-zoom-in"></a>
+								<a href="data:image/png;base64,<%=encoder.encodeToString(((SpacePhotoVO)pageContext.getAttribute("spacePhotoVO")).getSpacePhoto())%>" title="Photo title" data-effect="mfp-zoom-in"></a>
 								
 					</span>
 				
@@ -304,31 +318,66 @@
 						<div class="box_detail booking">
 							<div class="price">
 		
-										<span>${spaceDeatilVO.spaceDetailCharge}<small>half hour</small></span>
+										<span id="price">${spaceDeatilVO.spaceDetailCharge}</span><small>per hour</small>
 										
 								
-								<div class="score"><span>Good<em>350 Reviews</em></span><strong>7.0</strong></div>
+								<div class="score">
+									<span>
+									
+									<c:forEach var="spaceCommentVO" items="${listAllSpaceComment}">
+										<c:if test="${commentFromSpecificId <= 3}">
+											<h5>Good</h5>
+										</c:if>
+										<c:if test="${commentFromSpecificId <= 7 || commentFromSpecificId > 3}">
+											<h5>Average</h5>
+										</c:if>
+										<c:if test="${spaceCommentVO.spaceCommentLevel == 3}">
+											<h5>Bad</h5>
+										</c:if>
+									</c:forEach>
+										<em>350 Reviews</em></span><strong>7.0</strong>
+								
+								
+								
+								
+								
+								
+								
+								
+								</div>
+								
+								
+								
+								
+								
 							</div>
 
+							
+							
+							
 							<div class="form-group input-dates">
-								<input class="form-control" type="text" name="datetimes" id="calcDate_${spaceVO.spaceId}" placeholder="When.." >
+								<input class="form-control" type="text" name="dates" id="calcDate_${spaceVO.spaceId}" placeholder="When.." >
 								<i class="icon_calendar"></i>
 								
 							</div>
 
-							<div class="panel-dropdown">
-								<a href="#">Guests <span class="qtyTotal" id="calcGuests">1</span></a>
-								<div class="panel-dropdown-content right">
-									<div class="qtyButtons">
-										<label>Adults</label>
-										<input type="text" name="qtyInput" value="1" >
+							
+							
+								<div class="panel-dropdown">
+										<a href="#">Guests <span class="qtyTotal">1</span></a>
+										<div class="panel-dropdown-content right">
+											<div class="qtyButtons">
+												<label>Adults</label>
+												<input type="text" name="qtyInput" value="1">
+											</div>
+											<div class="qtyButtons">
+												<label>Childrens</label>
+												<input type="text" name="qtyInput" value="0">
+											</div>
+										</div>
 									</div>
-									<div class="qtyButtons">
-										<label>Childrens</label>
-										<input type="text" name="qtyInput" value="0">
-									</div>
-								</div>
-							</div>
+
+								
 
 							
 							<a href="<%=request.getContextPath()%>/frontendPage/orderSingle.jsp" class=" add_top_30 btn_1 full-width purchase" name="totalChargePerHour" >Purchase</a>
@@ -363,41 +412,87 @@
 
 	
 	
+	<!-- DATEPICKER  -->
 	<script>
-		$(function() {
-		  $('input[name="datetimes"]').daterangepicker({
-		    timePicker: true,
-		    startDate: moment().startOf('hour'),
-		    endDate: moment().startOf('hour').add(32, 'hour'),
-		    locale: {
-		      format: 'M/DD hh:mm A'
-		    }
-		  });
+		$(function () {
+
+			$('input[name="dates"]').daterangepicker({
+				timePicker: true,
+				"timePicker24Hour": true,
+				startDate: moment().startOf('hour'),
+				endDate: moment().startOf('hour').add(32, 'hour'),
+				opens: 'left',
+				locale: {
+					cancelLabel: 'Clear',
+					format: 'YY/MM/DD HH:mm',
+				},
+				minDate: new Date(),
+			});
+
+			/*
+			$('input[name="dates"]').daterangepicker({
+				autoUpdateInput: false,
+				timePicker: true,
+				parentEl:'.scroll-fix',
+				minDate:new Date(),
+				opens: 'left',
+				locale: {
+					cancelLabel: 'Clear'
+				}
+			});
+			  */
+			
+			$('input[name="dates"]').on('apply.daterangepicker', function (ev, picker) {
+				$(this).val(picker.startDate.format('MM-DD-YY') + ' > ' + picker.endDate.format('MM-DD-YY'));
+				var start_date = picker.startDate;
+				var end_date = picker.endDate;
+				
+				var price = parseInt("50");
+
+				var diff_hours = end_date.diff(start_date, "hours");
+				var total_price = price * diff_hours;
+				
+
+				$("#price").html(total_price);
+			});
+			$('input[name="dates"]').on('cancel.daterangepicker', function (ev, picker) {
+				$(this).val('');
+			});
 		});
 	</script>
 	
 	
 	
-	<!-- DATEPICKER  -->
-<!-- 	<script>
-	$(function() {
-	  $('input[name="dates"]').daterangepicker({
-		  autoUpdateInput: false,
-		  parentEl:'.scroll-fix',
-		  minDate:new Date(),
-		  opens: 'left',
-		  locale: {
-			  cancelLabel: 'Clear'
-		  }
-	  });
-	  $('input[name="dates"]').on('apply.daterangepicker', function(ev, picker) {
-		  $(this).val(picker.startDate.format('MM-DD-YY') + ' > ' + picker.endDate.format('MM-DD-YY'));
-	  });
-	  $('input[name="dates"]').on('cancel.daterangepicker', function(ev, picker) {
-		  $(this).val('');
-	  });
-	});
-	</script> -->
+	<!-- Ajax here   -->
+	<script type="text/javascript">
+		function calc(amountMoney, totalHourGet){
+			
+			//take time to hour
+			var timeSpent = '1:25:58',
+		    amountPerHour = 100,
+		    time = timeSpent
+		        .split(':')
+		        .reduce((r, a, i) => r + a * Math.pow(60, -i), 0),
+		    result = time * amountPerHour;
+		    
+			console.log('time', time);
+			console.log('amount', result.toFixed(2));
+			
+			
+			
+			
+			totalHours = totalHourGet.value
+			if((totalHourGet)){
+				alert("not right value");
+				totalHourGet.value = 0;
+				totalHours = totalHourGet.value;
+				totalHourGet.focus();
+			}
+			var totalCharge = 'calcDate_' + amountMoney; 
+			
+			var charge = parseFloat(document.getElementById(calcDataId).innerText);
+		}
+	</script>
 	
 	
 	<!-- INPUT QUANTITY  -->
@@ -405,47 +500,13 @@
 	
 	
 	
-	
-	
-	<script type="text/javascript">
-		$(document).ready(function(){
-			$('#calcDate_${spaceVO.spaceId}').click(function(){
-				
-				var amountCharge = $()
-			});
-		
-		});
-		
-	
-	</script>
-  	
-  	<script>
-	  	/* $("#calcDate_${spaceVO.spaceId}").data("datetimepicker").getDate().getTime();
-	  	
-	
-	  	$("#calcDate_${spaceVO.spaceId}").find("input").val(); */
+
   	
   	
-		/* $(function() {
-		$('input[name="datetimes"]').daterangepicker({
-			timePicker: true,
-			timePickerIncrement: 30,
-			startDate: moment().startOf('hour'),
-			endDate: moment().startOf('hour').add(32, 'hour'),
-			locale: {
-			format: 'M/DD hh:mm A'
-			}
-		});
-		}); */
-	</script>
 	
 	<!--   =============================================== 觸發 Ajax ================================================ 
 	-->
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-
+	
   	
 </body>
 </html>
